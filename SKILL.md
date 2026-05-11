@@ -1,36 +1,36 @@
 ---
 name: confluence-auth-setup
-description: Install or update local Confluence read credentials by writing ~/.confluence-credentials for skills like confluence-search and prd-design-brief, with Shopee defaults so users can paste only a token.
+description: 通过写入 ~/.confluence-credentials 一键安装或更新本机 Confluence 读取凭据，供 confluence-search、prd-design-brief 等 skill 复用；支持只粘贴 token，并自动补全 Shopee 默认配置。
 ---
 
-# Confluence Auth Setup
+# Confluence 一键授权
 
-Use this skill when the user wants one-click Confluence authorization on the local machine so other skills can read internal Confluence pages.
+当用户希望在本机一键完成 Confluence 授权，让其他 skill 能直接读取公司内部 Confluence 文档时，使用这个 skill。
 
-## What this skill does
+## 这个 skill 会做什么
 
-- Accepts either:
-  - a raw Confluence token
-  - a single `export CONFLUENCE_TOKEN=...` line
-  - a full auth export block
-- Defaults to Shopee Confluence values when the user only provides a token:
+- 接受以下任一输入：
+  - 纯 Confluence token
+  - 单行 `export CONFLUENCE_TOKEN=...`
+  - 完整 export 授权块
+- 如果用户只提供 token，自动补全 Shopee Confluence 默认配置：
   - `CONFLUENCE_BASE_URL="https://confluence.shopee.io"`
   - `CONFLUENCE_AUTH_TYPE="Bearer"`
-- Writes those values into `~/.confluence-credentials`
-- Sets file permission to `600`
-- Backs up any existing credentials file before overwrite
-- Verifies the file exists and contains the required keys
+- 将配置写入 `~/.confluence-credentials`
+- 自动把文件权限设为 `600`
+- 覆盖前先备份已有凭据文件
+- 写入后校验必需字段是否存在
 
-## Trigger examples
+## 触发示例
 
 - `帮我授权 Confluence`
 - `安装 Confluence 读取权限`
 - `一键配置 confluence-search 的凭据`
 - `把这段 Confluence Bearer 授权写到本机`
 
-## Input format
+## 输入格式
 
-The preferred input is a shell-style export block, for example:
+推荐输入是 shell 风格的 export 授权块，例如：
 
 ```sh
 export CONFLUENCE_BASE_URL="https://confluence.example.com"
@@ -38,34 +38,34 @@ export CONFLUENCE_AUTH_TYPE="Bearer"
 export CONFLUENCE_TOKEN="REDACTED"
 ```
 
-For Shopee's default setup, the user can also provide only:
+如果是 Shopee 的默认配置，用户也可以只提供：
 
 ```text
 OTEyNDUyNjA3ODA3...
 ```
 
-or:
+或者：
 
 ```sh
 export CONFLUENCE_TOKEN="OTEyNDUyNjA3ODA3..."
 ```
 
-## Workflow
+## 执行流程
 
-1. Check whether the user provided a raw token, a token export, or a full export block.
-2. If the user only provided a token, assume:
+1. 判断用户提供的是纯 token、单行 token export，还是完整 export 授权块。
+2. 如果用户只提供了 token，则默认补全：
    - `CONFLUENCE_BASE_URL="https://confluence.shopee.io"`
    - `CONFLUENCE_AUTH_TYPE="Bearer"`
-3. Run `scripts/install_confluence_credentials.sh`, passing the provided content over stdin.
-4. If `~/.confluence-credentials` already exists, let the script create a timestamped backup beside it.
-5. Verify the file now exists and contains non-empty values for the three required keys.
-6. Confirm success to the user without echoing the token. Mask it if you need to mention it.
+3. 执行 `scripts/install_confluence_credentials.sh`，通过 stdin 传入用户提供的内容。
+4. 如果 `~/.confluence-credentials` 已存在，让脚本先在旁边生成带时间戳的备份。
+5. 校验写入后的文件已存在，并且三项必需配置都非空。
+6. 向用户确认成功或失败，但不要回显明文 token；如必须提及，只能脱敏展示。
 
-## Guardrails
+## 护栏
 
-- Never print the raw token back to the user.
-- Never commit credentials into a repo or save them inside the skill files.
-- Only write the local credentials file used for read access.
-- If the token is missing, stop and tell the user exactly what is missing.
-- If `CONFLUENCE_BASE_URL` or `CONFLUENCE_AUTH_TYPE` is missing but the user only gave a token, fill them with the Shopee defaults instead of stopping.
-- If another skill later needs Confluence access, prefer reusing this credentials file rather than asking the user to paste the token again.
+- 永远不要把明文 token 回显给用户。
+- 永远不要把凭据提交进仓库，也不要把 token 写进 skill 文件本身。
+- 只允许写本地读取所需的凭据文件。
+- 如果缺的是 token，必须明确告诉用户缺少哪一项，不要继续执行。
+- 如果缺的是 `CONFLUENCE_BASE_URL` 或 `CONFLUENCE_AUTH_TYPE`，且用户只给了 token，则自动补 Shopee 默认值，不要中断。
+- 如果后续其他 skill 也需要 Confluence 访问能力，优先复用这份本地凭据，不要反复让用户重新粘贴 token。

@@ -1,21 +1,21 @@
-# Confluence Auth Setup
+# Confluence 一键授权
 
-One-click local Confluence credential setup for Codex skills that need read access, such as `confluence-search` and `prd-design-brief`.
+用于在本机一键完成 Confluence 读取凭据配置，供 `confluence-search`、`prd-design-brief` 等需要读取公司内部文档的 skill 直接复用。
 
-## What it does
+## 能力说明
 
-- Accepts a raw token, a single `export CONFLUENCE_TOKEN=...` line, or a full export block
-- Defaults to Shopee Confluence values when only a token is provided
-- Writes `~/.confluence-credentials`
-- Backs up any existing credentials file
-- Sets file permission to `600`
+- 支持三种输入：纯 token、单行 `export CONFLUENCE_TOKEN=...`、完整 export 授权块
+- 如果只提供 token，会自动补全 Shopee Confluence 默认配置
+- 自动写入 `~/.confluence-credentials`
+- 覆盖前自动备份已有凭据文件
+- 自动将文件权限设为 `600`
 
-## Installed files
+## 仓库内容
 
 - `SKILL.md`
 - `scripts/install_confluence_credentials.sh`
 
-## Example input
+## 输入示例
 
 ```sh
 export CONFLUENCE_BASE_URL="https://confluence.shopee.io"
@@ -23,14 +23,14 @@ export CONFLUENCE_AUTH_TYPE="Bearer"
 export CONFLUENCE_TOKEN="REDACTED"
 ```
 
-Or just:
+或者只贴：
 
 ```text
 YOUR_CONFLUENCE_TOKEN
 ```
 
-## Safety
+## 安全说明
 
-- Never stores the token in the repo
-- Never prints the raw token back to the user
-- Only writes the local credentials file used for read access
+- 不会把 token 存进仓库
+- 不会把明文 token 回显给用户
+- 只会写本地读取所需的凭据文件
